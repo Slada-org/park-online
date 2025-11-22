@@ -635,6 +635,82 @@ body {
           </div>
         </div>
 
+<div class="col-md-6"> 
+    <div class="box box-success">
+        <div class="box-header with-border">
+            <h3 class="box-title">ADD TRANSACTION</h3>
+        </div>
+
+        <form role="form" action="" method="POST">
+            <div class="box-body">
+
+                <div class="form-group">
+                    <label for="txnAccount">Account Number</label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="txnAccount" 
+                        required 
+                        placeholder="Enter account number">
+                </div>
+
+                <div class="form-group">
+                    <label for="txnType">Transaction Type</label>
+                    <select class="form-control" id="txnType" required>
+                        <option value="credit">Credit</option>
+                        <option value="debit">Debit</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="txnAmount">Amount</label>
+                    <input 
+                        type="number" 
+                        class="form-control" 
+                        id="txnAmount" 
+                        required 
+                        placeholder="Enter amount">
+                </div>
+
+                <div class="form-group">
+                    <label for="txnRecipient">Recipient</label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="txnRecipient" 
+                        required 
+                        placeholder="Recipient name / account">
+                </div>
+
+                <div class="form-group">
+                    <label for="txnDesc">Description</label>
+                    <textarea 
+                        class="form-control" 
+                        id="txnDesc" 
+                        rows="3" 
+                        placeholder="Description of the transaction"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="txnAmount">Date</label>
+                    <input 
+                        type="date" 
+                        class="form-control" 
+                        id="txnDate" 
+                        required 
+                        placeholder="Enter amount">
+                </div>
+
+                <button type="submit" class="btn btn-success" 
+                    onclick="event.preventDefault(); addTransaction()">
+                    Add Transaction
+                </button>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+
 
 
         <div class="col-md-6"> 

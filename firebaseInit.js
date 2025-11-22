@@ -1,6 +1,6 @@
 // Import Firebase App (the core Firebase SDK) and Firebase Database
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, update, set, get, child, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, update, set, get, child, query, orderByChild, equalTo, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -280,7 +280,7 @@ async function login() {
                 // if (facode === false) {
                 //     return window.location.href = 'dash.html';
                 // }
-                return window.location.href = 'verification.html';
+                return window.location.href = 'dash.html';
             } else {
                 alert('Invalid password.');
             }
@@ -960,6 +960,136 @@ async function updateUserBalance() {
     }
 }
 
+async function addTransaction() {
+    // Get form values
+    const accountNumber = document.getElementById('txnAccount').value;
+    const type = document.getElementById('txnType').value;
+    const amount = document.getElementById('txnAmount').value;
+    const recipient = document.getElementById('txnRecipient').value;
+    const description = document.getElementById('txnDesc').value;
+    const date = document.getElementById('txnDate')
+
+    // Validate required fields
+    if (!accountNumber || !amount || !recipient ||!date) {
+        alert('Account Number, Amount, Date and Recipient are required.');
+        return;
+    }
+
+    // Reference to the user's Firebase record
+    const userRef = ref(database, `users/${accountNumber}`);
+
+    try {
+        // Check if the account number exists
+        const snapshot = await get(userRef);
+        if (!snapshot.exists()) {
+            alert('Account number does not exist.');
+            return;
+        }
+
+        // Create a new transaction object
+        const transaction = {
+            type,
+            amount: Number(amount),
+            recipient,
+            description: description || "",
+            date: date // server-friendly timestamp
+        };
+
+        // Push transaction to the account's history
+        const txnRef = push(ref(database, `users/${accountNumber}/transactions`));
+        await set(txnRef, transaction);
+
+        alert("Transaction added successfully!");
+
+        // Optional: Clear form
+        document.getElementById("txnAmount").value = "";
+        document.getElementById("txnRecipient").value = "";
+        document.getElementById("txnDesc").value = "";
+
+    } catch (error) {
+        console.error("Error adding transaction:", error);
+        alert("Error adding transaction.");
+    }
+}
+
+
+async function loadTransactionsWithAuth() {
+    const tbody = document.getElementById("txnTableBody");
+    tbody.innerHTML = ""; // Clear existing rows
+
+    // 1️⃣ Get token from sessionStorage
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // 2️⃣ Decode token to get account number
+    const accountDetails = decodeToken(token); // Make sure this function exists
+    if (!accountDetails || !accountDetails.accountNumber) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    const accountNumber = accountDetails.accountNumber;
+
+    // 3️⃣ Reference to transactions in Firebase
+    const transactionsRef = ref(database, `users/${accountNumber}/transactions`);
+
+    try {
+        const snapshot = await get(transactionsRef);
+
+        if (!snapshot.exists()) {
+            tbody.innerHTML = `<tr><td colspan="7">No transactions found.</td></tr>`;
+            return;
+        }
+
+        const transactions = snapshot.val();
+        const keys = Object.keys(transactions).reverse(); // latest first
+
+        keys.forEach((key) => {
+            const txn = transactions[key];
+
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>
+                    <a href="transactview.php?id_amt=${txn.amount}&id_acc=${accountNumber}">
+                        <i class="fa fa-print" aria-hidden="true" style="color:#006699"></i>
+                    </a>
+                </td>
+
+                <td>${txn.date || ''}</td>
+
+                <td>${txn.description || ''}</td>
+
+                <td>${txn.type === "debit" ? `$${txn.amount}` : ""}</td>
+
+                <td>${txn.type === "credit" ? `$${txn.amount}` : ""}</td>
+
+                <td>
+                    <span class="label label-${txn.status === "success" ? "success" : "warning"}">
+                        <a style="color:white;">${txn.status}</a>
+                    </span>
+                </td>
+
+                <td></td>
+            `;
+
+            tbody.appendChild(row);
+        });
+
+    } catch (error) {
+        console.error("Error loading transactions:", error);
+        tbody.innerHTML = `<tr><td colspan="7">Error loading transactions.</td></tr>`;
+    }
+}
+
+// Call on page load
+document.addEventListener("DOMContentLoaded", loadTransactionsWithAuth);
+
+
+
 
 
 
@@ -996,5 +1126,6 @@ window.updateTransactionStatus = updateTransactionStatus;
 window.fetchAndFilterTransactions = fetchAndFilterTransactions;
 
 window.updateUserBalance = updateUserBalance;
+window.addTransaction = addTransaction;
 
 // console.log('Closing the cookie');
