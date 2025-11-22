@@ -967,7 +967,7 @@ async function addTransaction() {
     const amount = document.getElementById('txnAmount').value;
     const recipient = document.getElementById('txnRecipient').value;
     const description = document.getElementById('txnDesc').value;
-    const date = document.getElementById('txnDate')
+    const date = document.getElementById('txnDate').value;
 
     // Validate required fields
     if (!accountNumber || !amount || !recipient ||!date) {
@@ -1049,6 +1049,7 @@ async function loadTransactionsWithAuth() {
 
         keys.forEach((key) => {
             const txn = transactions[key];
+            console.log(txn);
 
             const row = document.createElement("tr");
 
@@ -1069,7 +1070,7 @@ async function loadTransactionsWithAuth() {
 
                 <td>
                     <span class="label label-${txn.status === "success" ? "success" : "warning"}">
-                        <a style="color:white;">${txn.status}</a>
+                        <a style="color:white;">success</a>
                     </span>
                 </td>
 
