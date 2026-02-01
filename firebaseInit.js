@@ -455,7 +455,7 @@ async function getUserDetails() {
     } catch (error) {
         console.error('Error during authentication:', error);
         // Token verification failed
-        alert('Error retrieving user details.');
+        // alert('Error retrieving user details.');
         const url = window.location.href;
         sessionStorage.setItem('url', url)
         // window.location.href = 'login.html';
